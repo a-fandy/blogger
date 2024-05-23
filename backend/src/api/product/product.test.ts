@@ -20,8 +20,8 @@ describe('ProductService', () => {
     ];
 
     const mockProductsInUser = [
-        { id: '6642dd388e0e958c252bb9cc', name: 'Test Product 3', desc: 'Description 3', price: 300, imagePath: 'path/to/image3', categories: ['cat3'], status: true , user: '12345'},
-        { id: '6642dd388e0e958c252bb9cd', name: 'Test Product 4', desc: 'Description 4', price: 400, imagePath: 'path/to/image4', categories: ['cat4'], status: false , user: '12345'},
+        { id: '6642dd388e0e958c252bb9cc', name: 'Test Product 3', desc: 'Description 3', price: 300, imagePath: 'path/to/image3', categories: ['cat3'], status: true, user: '12345' },
+        { id: '6642dd388e0e958c252bb9cd', name: 'Test Product 4', desc: 'Description 4', price: 400, imagePath: 'path/to/image4', categories: ['cat4'], status: false, user: '12345' },
     ];
 
     beforeEach(() => {
@@ -29,7 +29,7 @@ describe('ProductService', () => {
             create: jest.fn().mockResolvedValue(product)
         };
         productService = new ProductService(mockProductRepository as ProductRepository);
-        
+
     });
 
     it('should create a product successfully', async () => {
@@ -137,7 +137,7 @@ describe('ProductService', () => {
                 { desc: { $regex: new RegExp('Test', 'i') } },
             ],
             deletedAt: null,
-            user: '12345' 
+            user: '12345'
         });
     });
 
@@ -152,7 +152,7 @@ describe('ProductService', () => {
                 categories: ['updated_category'],
                 status: true
             },
-            user: { _id: '12345' }
+            user: { _id: '12345', role: 'user' }
         };
 
         const updatedProduct = {
@@ -165,22 +165,20 @@ describe('ProductService', () => {
             status: true
         };
 
-        mockProductRepository.findOne = jest.fn().mockResolvedValue(mockProductsInUser[0]);
         mockProductRepository.updateOne = jest.fn().mockResolvedValue(updatedProduct);
 
         const result = await productService.update(mockRequest as Request);
 
         expect(result).toEqual(updatedProduct);
-        expect(mockProductRepository.findOne).toHaveBeenCalledWith({ _id: '6642dd388e0e958c252bb9cc', deletedAt: null, user: '12345' });
-        expect(mockProductRepository.updateOne).toHaveBeenCalledWith({ _id: '6642dd388e0e958c252bb9cc', deletedAt: null, user: '12345' }, 
-        {
-            name: 'Updated Product',
-            desc: 'Updated Description',
-            price: 150,
-            imagePath: 'updated_path.jpg',
-            categories: ['updated_category'],
-            status: true
-        });
+        expect(mockProductRepository.updateOne).toHaveBeenCalledWith({ _id: '6642dd388e0e958c252bb9cc', user: '12345' },
+            {
+                name: 'Updated Product',
+                desc: 'Updated Description',
+                price: 150,
+                imagePath: 'updated_path.jpg',
+                categories: ['updated_category'],
+                status: true
+            });
     });
 
     it('should delete a product successfully', async () => {
@@ -188,7 +186,7 @@ describe('ProductService', () => {
             body: {
                 id: '6642dd388e0e958c252bb9cc'
             },
-            user: { _id: '12345' }
+            user: { _id: '12345', role: 'user' }
         };
 
         const deletedProduct = {
@@ -201,12 +199,11 @@ describe('ProductService', () => {
             status: false
         };
 
-        mockProductRepository.findOne = jest.fn().mockResolvedValue(deletedProduct);
         mockProductRepository.deleteOne = jest.fn().mockResolvedValue(deletedProduct);
 
         const result = await productService.delete(mockRequest as Request);
-
         expect(result).toEqual(deletedProduct);
+        expect(mockProductRepository.deleteOne).toHaveBeenCalledWith({ _id: '6642dd388e0e958c252bb9cc', user: '12345' });
     }); // This closes the last test case
 
 }); // This closes the describe bloc

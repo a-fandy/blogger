@@ -100,11 +100,19 @@ class ProductService {
         if (!mongoose.isValidObjectId(id)) {
             throw new BadRequest("Product not found")
         }
-        const product = await this.productRepository.findOne({ _id: id , deletedAt: null, user: request.user._id.toString()})
-        if (!product) {
+
+        let query = {
+            _id: id
+        }
+        if (request.user.role == 'user') {
+            (query as any).user =  request.user._id.toString()
+        }
+
+        const updatedProduct = await this.productRepository.updateOne(query, { name, desc, price, imagePath, categories, status })
+        if (!updatedProduct) {
             throw new NotFoundError("Product not found")
         }
-        const updatedProduct = await this.productRepository.updateOne({ _id: id, deletedAt: null, user: request.user._id.toString() }, { name, desc, price, imagePath, categories, status })
+
         return updatedProduct
     }
 
@@ -113,11 +121,17 @@ class ProductService {
         if (!mongoose.isValidObjectId(id)) {
             throw new BadRequest("Product not found")
         }
-        const product = await this.productRepository.findOne({ _id: id , deletedAt: null, user: request.user._id.toString()})
-        if (!product) {
+        let query = {
+            _id: id
+        }
+        if (request.user.role == 'user') {
+            (query as any).user =  request.user._id.toString()
+        }
+        const deletedProduct = await this.productRepository.deleteOne(query);
+        if (!deletedProduct) {
             throw new NotFoundError("Product not found")
         }
-        const deletedProduct = await this.productRepository.deleteOne({ _id: id , deletedAt: null, user: request.user._id.toString()});
+       
         return deletedProduct
     }
 }

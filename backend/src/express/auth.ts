@@ -14,7 +14,7 @@ const auth = async (req:express.Request, res:express.Response, next:express.Next
         const token = authorization.split(" ")[1]
         const decode = jwt.verify(token, process.env.SECRET!) as jwt.JwtPayload
         const id:string = decode.id
-        req.user = await User.findOne({ _id: id, deletedAt: null, status: true }).select("_id")
+        req.user = await User.findOne({ _id: id, deletedAt: null, status: true }).select("_id, role")
         if (!req.user) {
             return res.status(401).json(ErrorResponse(new AuthenticationFailed("Credential not found")));
         }

@@ -9,5 +9,7 @@ export default interface ProductDto {
     // deletedAt?: Date;
     desc?: string | null | undefined; // Adjusted to match the MongoDB model
     imagePath?: string | null | undefined; 
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 

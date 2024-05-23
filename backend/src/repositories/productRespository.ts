@@ -36,10 +36,12 @@ class ProductRepository {
     }
 
     async findOne(query: any): Promise<ProductDto | null> {
+        (query as any).deletedAt = null
         return await Product.findOne(query)
     }
 
     async updateOne(query:any, update: ProductDto): Promise<ProductDto | null> {
+        (query as any).deletedAt = null
         const updatedProduct = await Product.findOneAndUpdate(query, update)
         if (!updatedProduct) {
             return null
@@ -55,6 +57,7 @@ class ProductRepository {
     }
 
     async deleteOne(query:any): Promise<ProductDto | null> {
+        (query as any).deletedAt = null
         const deletedProduct = await Product.findByIdAndUpdate(query, { deletedAt: Date.now() })
         if (!deletedProduct) {
             return null
@@ -66,8 +69,7 @@ class ProductRepository {
             price: deletedProduct.price,
             imagePath: deletedProduct.imagePath,
             categories: deletedProduct.categories,
-            status: deletedProduct.status,
-            // deletedAt: deletedProduct.deletedAt
+            status: deletedProduct.status
         }
     }
 }
